@@ -1,14 +1,14 @@
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import AuthenticateToken from "@/lib/middleware/AuthenticateToken";
-import bcrypt from 'bcrypt'
+import bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
 const saltRound = 10;
 
 export async function GET(req: NextRequest) {
   const authResponse = await AuthenticateToken(req);
-  if (authResponse) return authResponse;
+  if (!authResponse || authResponse.status === 403) return authResponse;
 
   try {
     const email = req.nextUrl.searchParams.get("email");
@@ -33,12 +33,16 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const authResponse = await AuthenticateToken(req);
+  console.log("res api post: ", authResponse);
+  if (!authResponse || authResponse.status === 403) return authResponse;
+
   try {
     const input = await req.json();
     const data = {
       ...input,
       password: bcrypt.hashSync(input.password, saltRound),
-      name: "",
+      name: input?.name,
       role: input?.role || "",
     };
 

@@ -28,7 +28,7 @@ export default function RootLayout({
       <SideBar />
       <div className="h-screen w-4/5">
         <SearchBar />
-        <div className="h-auto bg-white">{children}</div>
+        <div className="h-auto bg-white mt-10">{children}</div>
       </div>
     </div>
   );

@@ -9,29 +9,35 @@ import "./usersStyle.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function UsersBox() {
   const [users, setUsers]: any = useState([]);
-  const { data } = useSession();
 
   useEffect(() => {
-    // if (!session?.token) {
-    //   console.log("No session token available");
-    //   return; // Keluar lebih awal jika tidak ada token
-    // }
+    const token = localStorage.getItem("token");
+    console.log(token);
+    if (!token) {
+      // signOut({ redirect: true, callbackUrl: "/" });
+      return;
+    }
     const fetchUsers = async () => {
-      console.log("Token bosz => ", data);
-      // const token = session?.
-      // const users = await axios.get("/api/users", { headers: {
-      //   Authorization: `Bearer ${}`
-      // } });
       try {
-        console.log("masuk jihh users => ", users.data);
-        setUsers(users.data);
+        const res = await axios.get("/api/users", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        console.log(res);
+        if (res.status === 403) {
+          return signOut({ redirect: true, callbackUrl: "/" });
+        }
+        setUsers(res.data);
       } catch (error) {
-        console.log("error when fetch users");
+        console.log("error when fetch users", error);
+        signOut({ redirect: true, callbackUrl: "/" });
         return null;
       }
     };
@@ -55,7 +61,7 @@ export default function UsersBox() {
           Add
         </p>
       </Link>
-      <section className="table w-full">
+      <section className="table w-full px-4">
         <div className="flex justify-between items-center mb-5 px-2">
           <div className="w-[15%] flex justify-between items-center">
             <p>Show</p>
@@ -82,7 +88,7 @@ export default function UsersBox() {
         <table className="w-full flex flex-col">
           <thead className="w-full">
             <tr className="flex w-full justify-between text-slate-500">
-              <th className="flex justify-between w-2/12 px-1 py-2 border">
+              <th className="flex justify-between w-2/12 px-2 py-2 border">
                 <h3>User ID</h3>
                 <div className="icon-thead flex gap-2">
                   <FontAwesomeIcon
@@ -121,7 +127,7 @@ export default function UsersBox() {
                   />
                 </div>
               </th>
-              <th className="flex justify-between w-2/12 px-1 py-2 border">
+              <th className="flex justify-between w-2/12 px-2 py-2 border">
                 <h3>Role</h3>
                 <div className="icon-thead flex gap-2">
                   <FontAwesomeIcon
@@ -139,21 +145,30 @@ export default function UsersBox() {
               </th>
             </tr>
           </thead>
-          {/* {users.map((user: any, index: any) => (
-              <tr key={user.id}>
-                <td>{index + 1}</td>
-                <td>{user.email}</td>
-                <td>{user.name}</td>
-                <td>{user.role}</td>
-                <td>
-                  <div className="logo">
-                    <FontAwesomeIcon icon={faCircleInfo} />
-                    <FontAwesomeIcon icon={faTrash} />
+          <tbody className="w-full">
+            {users.map((user: any, index: any) => (
+              <tr
+                className="flex w-full justify-between text-slate-500"
+                key={index}
+              >
+                <td className="w-2/12 px-1 py-2 border">{index + 1}</td>
+                <td className="w-3/12 px-1 py-2 border">{user.email}</td>
+                <td className="w-3/12 px-1 py-2 border">{user.name}</td>
+                <td className="w-2/12 px-1 py-2 border">{user.role}</td>
+                <td className="w-2/12 px-1 py-2 border">
+                  <div className="flex gap-4">
+                    <button className="text-white bg-green-600 w-3/12 rounded-[50%] px-1 py-2">
+                      <FontAwesomeIcon icon={faCircleInfo} />
+                    </button>
+                    <button className="text-white bg-red-600 w-3/12 rounded-[50%] px-1 py-2">
+                      <FontAwesomeIcon icon={faTrash} />
+                    </button>
                   </div>
                 </td>
               </tr>
-            ))} */}
-          <thead className="w-full">
+            ))}
+          </tbody>
+          <tfoot className="w-full">
             <tr className="flex w-full justify-between text-slate-500">
               <th className="w-2/12 px-1 py-2 border">
                 <h3 className="text-left">User ID</h3>
@@ -171,7 +186,7 @@ export default function UsersBox() {
                 <h3 className="text-left">Actions</h3>
               </th>
             </tr>
-          </thead>
+          </tfoot>
         </table>
         <div className="p-2">
           <p>showing NUMBER to NUMBER of NUMBER entries</p>

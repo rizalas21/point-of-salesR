@@ -3,9 +3,13 @@
 import { faDatabase, faUndo } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
+import { signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function AddUsers() {
+  const router = useRouter();
+
   const [data, setData] = useState({
     email: "",
     name: "",
@@ -13,17 +17,29 @@ export default function AddUsers() {
     role: "",
   });
 
+  console.log("data asal lahh belum di push: ", data);
+
   const handleSubmit = async () => {
-    const token = await localStorage.getItem("token");
+    try {
+      const token = await localStorage.getItem("token");
 
-    const res = await axios.post("/api/users", data, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer" + token,
-      },
-    });
+      console.log(data);
 
-    return res;
+      const res = await axios.post("/api/users", data, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+      });
+      router.push("/home/users");
+      if (!res || res.status === 403) {
+        signOut({ redirect: true, callbackUrl: "/" });
+      }
+      return res;
+    } catch (error) {
+      signOut({ redirect: true, callbackUrl: "/" });
+      return null;
+    }
   };
 
   const handleChange = (e: any) => {
@@ -41,7 +57,7 @@ export default function AddUsers() {
       <div className="flex w-full justify-start text-white font-thin rounded-[5px] text-center mb-2 bg-slate-100 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] h-[8vh] items-center pl-2">
         <p className="text-blue-400 font-medium">Form Add</p>
       </div>
-      <form className="flex flex-col p-10 gap-5">
+      <form className="flex flex-col p-10 gap-5" onSubmit={handleSubmit}>
         <div className="flex justify-between w-full h-[6vh] rounded">
           <label>Email</label>
           <input
@@ -97,7 +113,11 @@ export default function AddUsers() {
         </div>
       </form>
       <div className="flex w-full justify-start text-white font-thin rounded-[5px] text-center mb-2 bg-slate-100 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] h-[8vh] items-center gap-5 px-5 py-2">
-        <button className="flex w-[8vw] h-full justify-between items-center h-4/5 bg-green-600">
+        <button
+          className="flex w-[8vw] h-full justify-between items-center h-4/5 bg-green-600"
+          type="submit"
+          onClick={handleSubmit}
+        >
           <FontAwesomeIcon
             className="rounded-l text-center bg-green-700 px-2.5 py-2 text-slate-300 w-1/5 hover:bg-green-800 text-white"
             icon={faDatabase}
@@ -111,7 +131,10 @@ export default function AddUsers() {
             className="rounded-l text-center bg-yellow-700 px-2.5 py-2 text-slate-300 w-1/5 hover:bg-yellow-800 text-white"
             icon={faUndo}
           />
-          <p className="rounded-l text-center bg-yellow-500 px-2.5 py-2 text-slate-300 w-4/5 hover:bg-yellow-800 h-full text-white font-medium">
+          <p
+            className="rounded-l text-center bg-yellow-500 px-2.5 py-2 text-slate-300 w-4/5 hover:bg-yellow-800 h-full text-white font-medium"
+            onClick={() => router.back()}
+          >
             Cancel
           </p>
         </button>

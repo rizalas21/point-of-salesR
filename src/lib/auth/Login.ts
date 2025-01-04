@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
 
@@ -18,7 +19,9 @@ export async function Login(email: string, password: string) {
       },
     });
 
-    if (user && user.password === password) {
+    const bcryptPass = bcrypt.compareSync(password, user?.password || "");
+
+    if (user && bcryptPass) {
       const accessToken = jwt.sign(
         { email: user?.email, name: user?.name },
         process.env.ACCESS_TOKEN_SECRET ?? "",
