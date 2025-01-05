@@ -11,8 +11,13 @@ export async function GET(req: NextRequest) {
   if (!authResponse || authResponse.status === 403) return authResponse;
 
   try {
+    const keyword = req.nextUrl.searchParams.get("keyword");
     const email = req.nextUrl.searchParams.get("email");
     const name = req.nextUrl.searchParams.get("name");
+    const page = req.nextUrl.searchParams.get("page");
+    const sort = req.nextUrl.searchParams.get("sort");
+    const sortBy = req.nextUrl.searchParams.get("sortBy");
+
     const data = await prisma.users.findMany({
       where: {
         OR: [
@@ -34,7 +39,6 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const authResponse = await AuthenticateToken(req);
-  console.log("res api post: ", authResponse);
   if (!authResponse || authResponse.status === 403) return authResponse;
 
   try {

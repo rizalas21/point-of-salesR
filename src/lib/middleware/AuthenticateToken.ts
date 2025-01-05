@@ -3,10 +3,8 @@ import jwt from "jsonwebtoken";
 
 export default function AuthenticateToken(req: any) {
   const token = req.headers.get("authorization").split(" ")[1];
-  console.log("Authorization Header:", req.headers.get("authorization")); // Debugging log
 
   if (!token) {
-    console.log("Token not found"); // Debugging log
     return NextResponse.json({ message: "Unauthorized" }, { status: 403 });
   }
 

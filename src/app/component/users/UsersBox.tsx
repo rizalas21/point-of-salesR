@@ -190,6 +190,7 @@ export default function UsersBox() {
         </table>
         <div className="p-2">
           <p>showing NUMBER to NUMBER of NUMBER entries</p>
+          <div className=""></div>
         </div>
       </section>
     </div>
