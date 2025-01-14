@@ -12,28 +12,27 @@ export async function GET(req: NextRequest) {
 
   try {
     const keyword = req.nextUrl.searchParams.get("keyword");
-    const email = req.nextUrl.searchParams.get("email");
-    const name = req.nextUrl.searchParams.get("name");
     const page = req.nextUrl.searchParams.get("page");
     const sort = req.nextUrl.searchParams.get("sort");
-    const sortBy = req.nextUrl.searchParams.get("sortBy");
+    const orderBy = req.nextUrl.searchParams.get("sortBy");
 
     const data = await prisma.users.findMany({
       where: {
         OR: [
           {
-            email: { contains: email ?? "" },
+            email: { contains: keyword ?? "" },
           },
           {
-            name: { contains: name ?? "" },
+            name: { contains: keyword ?? "" },
           },
         ],
       },
+      orderBy: {},
     });
 
     return NextResponse.json(data, { status: 200 });
   } catch (error) {
-    console.log("error when get users => ", error);
+    return NextResponse.json(error);
   }
 }
 

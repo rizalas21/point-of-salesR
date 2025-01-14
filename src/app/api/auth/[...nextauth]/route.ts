@@ -26,11 +26,9 @@ export const authOptions: NextAuthOptions = {
           const { email, password } = credentials;
           const User = await Login(email, password);
           if (!User) return null;
-          console.log("data bro: ", email, password, "users login: ", User);
           return User;
         } catch (err) {
-          console.log("error when author => ", err);
-          return null;
+          return alert(err);
         }
       },
     }),

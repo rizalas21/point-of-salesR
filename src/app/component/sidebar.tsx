@@ -14,7 +14,7 @@ import Link from "next/link";
 
 export default function SideBar() {
   return (
-    <div className="bg-blue-600 w-1/5 flex flex-col items-center h-auto">
+    <div className="bg-blue-600 w-full flex flex-col items-center h-screen">
       <section className="text-white flex justify-around items-center w-4/5 h-[10%] border-b border-slate-100">
         <div className="flex justify-between items-center w-2/5">
           <FontAwesomeIcon

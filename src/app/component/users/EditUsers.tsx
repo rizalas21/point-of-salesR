@@ -4,11 +4,13 @@ import { faDatabase, faUndo } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import { signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
-export default function AddUsers() {
+export default function EditUsers() {
   const router = useRouter();
+  const params = useParams();
+  const id = params.id;
 
   const [data, setData] = useState({
     email: "",
@@ -17,7 +19,18 @@ export default function AddUsers() {
     role: "",
   });
 
-  console.log("data asal lahh belum di push: ", data);
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const { data } = await axios.get(`/api/users/${id}`);
+      console.log(data);
+      setData(data);
+      return;
+    };
+
+    fetchUsers();
+  }, []);
+
+  console.log(data);
 
   const handleSubmit = async () => {
     try {
@@ -55,7 +68,7 @@ export default function AddUsers() {
   return (
     <div className=" flex flex-col shadow-2xl h-full bg-white">
       <div className="flex w-full justify-start text-white font-thin rounded-[5px] text-center mb-2 bg-slate-100 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] h-[8vh] items-center pl-2">
-        <p className="text-blue-600 font-bold">Form Add</p>
+        <p className="text-blue-600 font-bold">Form Edit</p>
       </div>
       <form className="flex flex-col p-10 gap-5" onSubmit={handleSubmit}>
         <div className="flex justify-between w-full h-[6vh] rounded">
@@ -66,6 +79,7 @@ export default function AddUsers() {
             className="w-4/5 border p-1.5 drop-shadow"
             name="email"
             onChange={handleChange}
+            value={data.email}
           />
         </div>
         <div className="flex justify-between w-full h-[6vh] rounded">
@@ -76,16 +90,7 @@ export default function AddUsers() {
             className="w-4/5 border p-1.5 drop-shadow"
             name="name"
             onChange={handleChange}
-          />
-        </div>
-        <div className="flex justify-between w-full h-[6vh] rounded">
-          <label>Password</label>
-          <input
-            placeholder="Password"
-            type="password"
-            className="w-4/5 border p-1.5 drop-shadow"
-            name="password"
-            onChange={handleChange}
+            value={data.name}
           />
         </div>
         <div className="flex justify-between w-full">
@@ -95,8 +100,9 @@ export default function AddUsers() {
               <input
                 type="radio"
                 name="role"
-                value="operator"
                 onChange={handleChange}
+                value="Operator"
+                checked={data.role === "Operator"}
               />
               <span>Operator</span>
             </div>
@@ -104,8 +110,9 @@ export default function AddUsers() {
               <input
                 type="radio"
                 name="role"
-                value="admin"
+                value="Admin"
                 onChange={handleChange}
+                checked={data.role === "Admin"}
               />
               <span>Admin</span>
             </div>

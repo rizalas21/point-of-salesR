@@ -12,15 +12,18 @@ import axios from "axios";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { modalDelete } from "../alert";
 
 export default function UsersBox() {
   const [users, setUsers]: any = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState({ userid: 1, email: "" });
+  const router = useRouter();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    console.log(token);
     if (!token) {
-      // signOut({ redirect: true, callbackUrl: "/" });
+      signOut({ redirect: true, callbackUrl: "/" });
       return;
     }
     const fetchUsers = async () => {
@@ -45,8 +48,6 @@ export default function UsersBox() {
     fetchUsers();
   }, [setUsers]);
 
-  console.log("users nihh bosz => ", users);
-
   return (
     <div className="shadow-2xl h-auto bg-white">
       <Link
@@ -55,9 +56,9 @@ export default function UsersBox() {
       >
         <FontAwesomeIcon
           icon={faPlus}
-          className="rounded-l text-center bg-blue-700 px-2.5 py-2 text-slate-300 w-[2vw] hover:bg-blue-800"
+          className="rounded-l text-center bg-blue-700 px-2.5 py-2 text-slate-300 w-[1vw] hover:bg-blue-800"
         />
-        <p className="rounded-r text-center bg-blue-600 px-2.5 py-1 text-base w-[5vw] hover:bg-blue-800">
+        <p className="rounded-r text-center bg-blue-600 px-2.5 py-1 text-base w-[4vw] hover:bg-blue-800">
           Add
         </p>
       </Link>
@@ -157,10 +158,24 @@ export default function UsersBox() {
                 <td className="w-2/12 px-1 py-2 border">{user.role}</td>
                 <td className="w-2/12 px-1 py-2 border">
                   <div className="flex gap-4">
-                    <button className="text-white bg-green-600 w-3/12 rounded-[50%] px-1 py-2">
+                    <button
+                      className="text-white bg-green-600 w-3/12 rounded-[50%] px-1 py-2"
+                      onClick={() =>
+                        router.push(`/home/users/edit/${user.userid}`)
+                      }
+                    >
                       <FontAwesomeIcon icon={faCircleInfo} />
                     </button>
-                    <button className="text-white bg-red-600 w-3/12 rounded-[50%] px-1 py-2">
+                    <button
+                      className="text-white bg-red-600 w-3/12 rounded-[50%] px-1 py-2"
+                      onClick={() => {
+                        setSelectedUser({
+                          userid: user.userid,
+                          email: user.email,
+                        });
+                        setShowModal(true);
+                      }}
+                    >
                       <FontAwesomeIcon icon={faTrash} />
                     </button>
                   </div>
@@ -190,9 +205,12 @@ export default function UsersBox() {
         </table>
         <div className="p-2">
           <p>showing NUMBER to NUMBER of NUMBER entries</p>
-          <div className=""></div>
+          <div className="flex">
+            <button></button>
+          </div>
         </div>
       </section>
+      {showModal ? modalDelete(selectedUser, setShowModal) : ""}
     </div>
   );
 }

@@ -25,8 +25,10 @@ export default function RootLayout({
 
   return (
     <div className="flex">
-      <SideBar />
-      <div className="h-screen w-4/5">
+      <div className="fixed w-1/5">
+        <SideBar />
+      </div>
+      <div className="ml-[20%] w-4/5">
         <SearchBar />
         <div className="h-auto bg-white pt-12">{children}</div>
       </div>
